@@ -7,9 +7,8 @@ import runpod
 
 # Load Stable Diffusion 1.5 once when the worker starts
 pipe = StableDiffusionPipeline.from_pretrained(
-    "runwayml/stable-diffusion-v1-5",
-    torch_dtype=torch.float16
-).to("cuda")
+    "runwayml/stable-diffusion-v1-5"
+)
 
 
 def generate_image(prompt: str):
