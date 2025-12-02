@@ -1,4 +1,4 @@
-FROM runpod/serverless:0.4.0-py3.10-cuda11.8
+FROM runpod/serverless:latest
 
 WORKDIR /app
 
