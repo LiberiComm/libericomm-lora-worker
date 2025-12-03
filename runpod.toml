@@ -1,5 +1,11 @@
-[build]
-python_version = "3.10"
-
-[handler]
-entry_point = "handler.py"
+{
+  "tests": [
+    {
+      "name": "basic_prompt",
+      "input": {
+        "prompt": "a simple test prompt"
+      },
+      "timeout": 600000
+    }
+  ]
+}
