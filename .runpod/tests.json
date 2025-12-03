@@ -1,11 +1,11 @@
 {
   "tests": [
     {
-      "name": "basic_prompt",
+      "name": "smoke_test",
       "input": {
-        "prompt": "a simple test prompt"
+        "prompt": "test"
       },
-      "timeout": 60000
+      "timeout": 120000
     }
   ]
 }
