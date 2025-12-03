@@ -1,0 +1,17 @@
+{
+  "title": "LiberiComm LoRA Worker",
+  "description": "Applies my custom LoRA to generate images.",
+  "type": "serverless",
+  "category": "image",
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 20,
+    "presets": [
+      {
+        "name": "default",
+        "gpu": "NVIDIA A10G",
+        "memoryInGb": 10
+      }
+    ]
+  }
+}
