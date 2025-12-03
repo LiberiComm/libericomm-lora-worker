@@ -1,39 +1,48 @@
-import base64
-from io import BytesIO
-
-import torch
-from diffusers import StableDiffusionPipeline
 import runpod
+from diffusers import FluxPipeline
+import torch
 
-# Load Stable Diffusion 1.5 once when the worker starts
-pipe = StableDiffusionPipeline.from_pretrained(
-    "runwayml/stable-diffusion-v1-5"
-)
+# Load model and LoRA once on cold start
+pipe = None
 
+def load_model():
+    global pipe
+    if pipe is None:
+        base_model = "black-forest-labs/FLUX.1-dev"
+        lora_path = "/workspace/lora.safetensors"   # YOU WILL UPLOAD THIS FILE
+        
+        pipe = FluxPipeline.from_pretrained(
+            base_model,
+            torch_dtype=torch.float16
+        ).to("cuda")
+
+        pipe.load_lora_weights(lora_path)
+
+    return pipe
 
 def generate_image(prompt: str):
-    """Generate an image and return it as base64 PNG."""
-    image = pipe(prompt).images[0]
-
-    buffer = BytesIO()
-    image.save(buffer, format="PNG")
-    return base64.b64encode(buffer.getvalue()).decode()
-
+    pipe = load_model()
+    result = pipe(
+        prompt,
+        num_inference_steps=20,
+        guidance_scale=3.0
+    )
+    image = result.images[0]
+    return image
 
 def handler(event):
-    """
-    RunPod Serverless handler.
-    Expected input:
-    {
-      "input": {
-         "prompt": "a cute cat"
-      }
-    }
-    """
-    prompt = event["input"].get("prompt", "")
-    result = generate_image(prompt)
-    return {"image": result}
+    prompt = event.get("input", {}).get("prompt", "gstyle apple clipart")
 
+    image = generate_image(prompt)
 
-# Start the worker
+    # Return base64 encoded image
+    import base64
+    import io
+
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    base64_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    return { "image_base64": base64_image }
+
 runpod.serverless.start({"handler": handler})
